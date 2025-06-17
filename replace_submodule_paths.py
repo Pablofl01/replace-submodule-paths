@@ -25,10 +25,10 @@ def setup_safe_directories():
 def normalize_github_url(url):
     """Convert various GitHub URL formats to https format."""
     if 'git@github.com:' in url:
-        return url.replace('git@github.com:', 'https://github.com/')
+        url = url.replace('git@github.com:', 'https://github.com/')
     if url.startswith('git://'):
-        return url.replace('git://', 'https://')
-    return url.replace('.git', '')
+        url = url.replace('git://', 'https://')
+    return url.rstrip('.git')  # Changed from replace to rstrip
 
 def get_submodules():
     repo = Repo('.')
@@ -43,7 +43,6 @@ def get_submodules():
     return submodules
 
 def update_markdown_links(content, submodules):
-    # Match both relative links and absolute GitHub URLs with commit hashes
     pattern = r'\[([^\]]+)\]\(((?:\.{0,2}/[^\)]+)|(?:https://github\.com/[^/]+/[^/]+/(?:blob|tree)/[^/]+/[^\)]+))\)'
     
     def replace_link(match):
@@ -54,7 +53,6 @@ def update_markdown_links(content, submodules):
             for _, info in submodules.items():
                 repo_url = info['url']
                 if repo_url in path:
-                    # Replace old commit hash with current one
                     path_parts = path.split('/')
                     blob_index = path_parts.index('blob') if 'blob' in path_parts else path_parts.index('tree')
                     path_parts[blob_index + 1] = info['hash']
@@ -66,6 +64,7 @@ def update_markdown_links(content, submodules):
         for submodule_path, info in submodules.items():
             if path.startswith(submodule_path):
                 remaining_path = path[len(submodule_path):].lstrip('/')
+                # Remove redundant .git replacement since normalize_github_url already handles it
                 return f'[{text}]({info["url"]}/tree/{info["hash"]}/{remaining_path})'
         
         return match.group(0)
