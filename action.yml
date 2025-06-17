@@ -1,0 +1,18 @@
+name: 'Replace Submodule Paths'
+description: 'Replaces relative Markdown links to submodules with their corresponding GitHub URLs, using the correct commit hashes'
+
+inputs:
+  file_pattern:
+    description: 'Glob pattern for markdown files to process'
+    required: false
+    default: '**/*.md'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    INPUT_FILE_PATTERN: ${{ inputs.file_pattern }}
+
+branding:
+  icon: 'link'
+  color: 'blue'
