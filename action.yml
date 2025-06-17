@@ -9,7 +9,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: ghcr.io/Pablofl01/replace-submodule-paths-action:${{ env.VERSION }}
   env:
     INPUT_FILE_PATTERN: ${{ inputs.file_pattern }}
 
